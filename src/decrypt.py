@@ -1,6 +1,7 @@
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from .readKey import getPrivate
+import base64
 
 def decrypt(
     encrypted
@@ -9,7 +10,7 @@ def decrypt(
     private_key = getPrivate()
 
     original_message = private_key.decrypt(
-        encrypted,
+        base64.b64decode(encrypted.encode('utf-8')),
         padding.OAEP(
             mgf=padding.MGF1(algorithm=hashes.SHA256()),
             algorithm=hashes.SHA256(),
@@ -17,3 +18,6 @@ def decrypt(
         )
     )
     return original_message
+
+if __name__ == "__main__":
+    print(decrypt(input()))
