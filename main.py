@@ -1,4 +1,3 @@
-from src.logo import getlogo
 from src import *
 import getpass
 import os
@@ -35,6 +34,7 @@ def main():
                 print(getlogo() +'\n\n')
                 storePassword(access)
             elif i == '3':
+                os.system(cmd)
                 break
             else:
                 os.system(cmd)
@@ -42,21 +42,48 @@ def main():
                 print("Wrong Input")
 
 def storePassword(access):
-    i = input('\n1. Generate and store password\n2. Just Store the password\n')
+    i = input('1. Generate and store password\n2. Just Store the password\n')
     if i == '1':
-        pass
+        os.system(cmd)
+        print(getlogo() +'\n\n')
+        genetateNStore(access)
     elif i == '2':
         os.system(cmd)
         print(getlogo() +'\n\n')
         savepass(access)
 
-def savepass(access):
+def genetateNStore(access):
+    while True:
+        l = input("Enter Length of password ( > 6): ")
+        try:
+            t = int(l)
+        except:
+            os.system(cmd)
+            print(getlogo() +'\n\n')
+            print("Please enter integer")
+        else:
+            if int(l) > 6:
+                break
+            else:
+                os.system(cmd)
+                print(getlogo() +'\n\n')
+                print("Please give a length > 6\n")
+    
+    password = generator(int(l))
+    os.system(cmd)
+    print(getlogo() +'\n\n')
+    savepass(access, password=password)
+
+def savepass(access, password = ''):
     print('(Not all details are compulsory exept for password and url)\nEnter Details:')
     url = input('Url: ')
     username = input('Username: ')
     email = input('Email: ')
-    password = input('Password: ')
-    notes = input('Url: ')
+    if password == '':
+        password = input('Password: ')
+    else:
+        print(f"Password: {password}")
+    notes = input('Notes: ')
     if password and url:
         access.savedata({
             'url' : url,
