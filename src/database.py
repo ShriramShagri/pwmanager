@@ -15,12 +15,11 @@ class DB:
 
     def savedata(self, data):
         encrypted = encrypt(data['password'].encode('utf-8'))
-        print(encrypted)
         sql = 'INSERT INTO domains VALUES (%s, %s, %s, %s, %s)'
         self.cur.execute(sql, (data['username'], data['email'], data['url'], encrypted, data['notes']))
         self.conn.commit()
     
-    def getdata(self, sql):
-        return self.cur.execute(
-            sql)
+    def getdata(self, elem):
+        self.cur.execute(f'SELECT * FROM domains WHERE {elem.keys()[-1]} = {elem.values()[-1]};')
+        return self.cur.fetchone()
 

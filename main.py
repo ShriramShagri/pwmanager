@@ -2,8 +2,10 @@ from src import *
 import getpass
 import os
 from sys import platform
+import pyperclip
 
 cmd = ''
+KEYPATH = os.getcwd()
 
 if platform == "linux" or platform == "linux2":
     cmd = 'clear' # Linux
@@ -97,5 +99,11 @@ def savepass(access, password = ''):
     print(getlogo() +'\n\n')
 
 
-main()
+if __name__ == "__main__":
+    if KEYPATH == '':
+        print('Please Run setup.py first')
+    elif os.path.exists(KEYPATH):
+        main()
+    else:
+        print('ERROR! Fix KEYPATH in main.py')
 
