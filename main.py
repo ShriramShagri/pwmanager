@@ -3,6 +3,7 @@ import getpass
 import os
 from sys import platform
 import pyperclip
+from prettytable import PrettyTable
 
 cmd = ''
 KEYPATH = os.getcwd()
@@ -21,37 +22,66 @@ def main():
     except Exception as err:
         print(err)
     else:
-        os.system(cmd)
-        print(getlogo() +'\n\n')
-
+        printLogo()
         while True:
             
-            print('Choose one of the following:\n1. Search Password\n2. Add New Password\n3. Exit')
+            print('Choose one of the following:\n1. Search Password\n2. Add New Password\n3. Delete Password\n4. View Password List\n5. Exit')
             i = input()
             if i == '1':
                 # Search for password
-                pass
+                printLogo()
+                searchPass(access)
             elif i == '2':
-                os.system(cmd)
-                print(getlogo() +'\n\n')
+                printLogo()
                 storePassword(access)
             elif i == '3':
-                os.system(cmd)
+                continue
+            elif i == '4':
+                printLogo()
+                showList(access)
+            elif i == '5':
+                clear()
                 break
             else:
-                os.system(cmd)
-                print(getlogo() +'\n\n')
+                printLogo()
                 print("Wrong Input")
+
+def showList(access):
+    passList = access.getall()
+    if passList:
+        x = PrettyTable()
+        x.field_names = ["URL", "email", "password", "Notes"]
+        for i in passList:
+            x.add_row(
+                [i[2], i[1], '****',i[4]]
+            )
+        print(x.get_string())
+    else:
+        print('\nNo Passwords Available')
+    print('Press enter to exit')
+    input()
+    printLogo()
+    return
+
+def searchPass(access):
+    print("Search by url and email")
+    email = input("Enter email: ")
+    url = input("Enter url: ")
+    data = access.getdata({'url' : url, 'email' : email})
+    pyperclip.copy(decrypt(data[3]).decode())
+    print("Copied to clipboard press any key to continue!")
+    input()
+    printLogo()
+    return
+
 
 def storePassword(access):
     i = input('1. Generate and store password\n2. Just Store the password\n')
     if i == '1':
-        os.system(cmd)
-        print(getlogo() +'\n\n')
+        printLogo()
         genetateNStore(access)
     elif i == '2':
-        os.system(cmd)
-        print(getlogo() +'\n\n')
+        printLogo()
         savepass(access)
 
 def genetateNStore(access):
@@ -60,20 +90,17 @@ def genetateNStore(access):
         try:
             t = int(l)
         except:
-            os.system(cmd)
-            print(getlogo() +'\n\n')
+            printLogo()
             print("Please enter integer")
         else:
             if int(l) > 6:
                 break
             else:
-                os.system(cmd)
-                print(getlogo() +'\n\n')
+                printLogo()
                 print("Please give a length > 6\n")
     
     password = generator(int(l))
-    os.system(cmd)
-    print(getlogo() +'\n\n')
+    printLogo()
     savepass(access, password=password)
 
 def savepass(access, password = ''):
@@ -95,8 +122,7 @@ def savepass(access, password = ''):
             'notes' : notes
         })
     
-    os.system(cmd)
-    print(getlogo() +'\n\n')
+    printLogo()
 
 
 if __name__ == "__main__":
