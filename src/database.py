@@ -14,12 +14,24 @@ class DB:
         self.cur = self.conn.cursor()
 
     def savedata(self, data):
-        encrypted = encrypt(data['password'].encode('utf-8'))
+        encrypted = (data['username'], data['email'], data['url'], encrypt(data['password'].encode('utf-8')), data['notes'])
         sql = 'INSERT INTO domains VALUES (%s, %s, %s, %s, %s)'
-        self.cur.execute(sql, (data['username'], data['email'], data['url'], encrypted, data['notes']))
+        self.cur.execute(sql, tuple(encrypted))
         self.conn.commit()
     
     def getdata(self, elem):
-        self.cur.execute(f'SELECT * FROM domains WHERE {elem.keys()[-1]} = {elem.values()[-1]};')
+        condition = ''
+        for k, v in elem.items():
+            condition += k + " LIKE '%" + v + "%' AND " 
+        condition = condition[:-5] + ';'
+        self.cur.execute(f'SELECT * FROM domains WHERE ' + condition)
         return self.cur.fetchone()
+    
+    def getall(self):
+        sql = "SELECT * FROM domains"
+        self.cur.execute(sql)
+        return self.cur.fetchall()
+
+if __name__ == "__main__":
+    DB('shagri', 'manager', 'lynx100210165').getdata({'foo' : 'bar', 'bar' : 'foo'})
 
