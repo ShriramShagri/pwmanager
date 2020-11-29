@@ -35,7 +35,8 @@ def main():
                 printLogo()
                 storePassword(access)
             elif i == '3':
-                continue
+                printLogo()
+                deletePass(access)
             elif i == '4':
                 printLogo()
                 showList(access)
@@ -45,6 +46,16 @@ def main():
             else:
                 printLogo()
                 print("Wrong Input")
+
+
+def deletePass(access):
+    print("Enter urlandemail of the password to be deleted")
+    url = input("Enter url: ")
+    email = input("Enter email: ")
+    access.deleteEntry({'url' : url, 'email' : email})
+    print("Deleted! Press enter to continue")
+    input()
+    printLogo()
 
 def showList(access):
     passList = access.getall()
