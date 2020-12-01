@@ -1,10 +1,12 @@
-from src.logo import getlogo
 from src import *
 import getpass
 import os
 from sys import platform
+import pyperclip
+from prettytable import PrettyTable
 
 cmd = ''
+KEYPATH = os.getcwd()
 
 if platform == "linux" or platform == "linux2":
     cmd = 'clear' # Linux
@@ -20,44 +22,111 @@ def main():
     except Exception as err:
         print(err)
     else:
-        os.system(cmd)
-        print(getlogo() +'\n\n')
-
         while True:
-            
-            print('Choose one of the following:\n1. Search Password\n2. Add New Password\n3. Exit')
+            printLogo()
+            print('Choose one of the following:\n1. Search Password\n2. Add New Password\n3. Delete Password\n4. View Password List\n5. Exit')
             i = input()
             if i == '1':
                 # Search for password
-                pass
+                printLogo()
+                searchPass(access)
             elif i == '2':
-                os.system(cmd)
-                print(getlogo() +'\n\n')
+                printLogo()
                 storePassword(access)
             elif i == '3':
+                printLogo()
+                deletePass(access)
+            elif i == '4':
+                printLogo()
+                showList(access)
+            elif i == '5':
+                clear()
                 break
             else:
-                os.system(cmd)
-                print(getlogo() +'\n\n')
+                printLogo()
                 print("Wrong Input")
 
+
+def deletePass(access):
+    print("Enter urlandemail of the password to be deleted")
+    url = input("Enter url: ")
+    email = input("Enter email: ")
+    access.deleteEntry({'url' : url, 'email' : email})
+    print("Deleted! Press enter to continue")
+    input()
+
+def showList(access):
+    passList = access.getall()
+    if passList:
+        x = PrettyTable()
+        x.field_names = ["URL", "email", "password", "Notes"]
+        for i in passList:
+            x.add_row(
+                [i[2], i[1], '****',i[4]]
+            )
+        print(x.get_string())
+    else:
+        print('\nNo Passwords Available')
+    print('Press enter to exit')
+    input()
+
+def searchPass(access):
+    print("Search by url and email")
+    email = input("Enter email: ")
+    url = input("Enter url: ")
+    data = access.getdata({'url' : url, 'email' : email})
+    if data:
+        pyperclip.copy(decrypt(data[3]).decode())
+        print("\nCopied to clipboard press ENTER to exit")
+    else:
+        print("\nNo Matches found. Press enter to go back")
+    input()
+    
+
+
 def storePassword(access):
-    i = input('\n1. Generate and store password\n2. Just Store the password\n')
+    i = input('1. Generate and store password\n2. Just Store the password\n')
     if i == '1':
-        pass
+        printLogo()
+        genetateNStore(access)
     elif i == '2':
-        os.system(cmd)
-        print(getlogo() +'\n\n')
+        printLogo()
         savepass(access)
 
-def savepass(access):
-    print('(Not all details are compulsory exept for password and url)\nEnter Details:')
+def genetateNStore(access):
+    while True:
+        print("Enter -1 to exit\n")
+        l = input("Enter Length of password ( > 6): ")
+        try:
+            t = int(l)
+        except:
+            printLogo()
+            print("Please enter integer")
+        else:
+            if t == -1:
+                return
+            elif int(l) > 6:
+                break
+            else:
+                printLogo()
+                print("Please give a length > 6\n")
+    
+    password = generator(int(l))
+    printLogo()
+    savepass(access, password=password)
+
+def savepass(access, password = ''):
+    print('(Not all details are compulsory exept for password, email and url)\nEnter Details:')
     url = input('Url: ')
     username = input('Username: ')
     email = input('Email: ')
-    password = input('Password: ')
-    notes = input('Url: ')
-    if password and url:
+    if password == '':
+        password = input('Password: ')
+    else:
+        print(f"Password: {'*'* len(password)}\nPassword Copied to clipboard")
+        pyperclip.copy(password)
+    notes = input('Notes: ')
+    if password and url and email:
         access.savedata({
             'url' : url,
             'username' : username,
@@ -65,10 +134,12 @@ def savepass(access):
             'email' : email,
             'notes' : notes
         })
-    
-    os.system(cmd)
-    print(getlogo() +'\n\n')
 
-
-main()
+if __name__ == "__main__":
+    if KEYPATH == '':
+        print('Please Run setup.py first')
+    elif os.path.exists(KEYPATH):
+        main()
+    else:
+        print('ERROR! Fix KEYPATH in main.py')
 
