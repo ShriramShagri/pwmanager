@@ -22,9 +22,8 @@ def main():
     except Exception as err:
         print(err)
     else:
-        printLogo()
         while True:
-            
+            printLogo()
             print('Choose one of the following:\n1. Search Password\n2. Add New Password\n3. Delete Password\n4. View Password List\n5. Exit')
             i = input()
             if i == '1':
@@ -55,7 +54,6 @@ def deletePass(access):
     access.deleteEntry({'url' : url, 'email' : email})
     print("Deleted! Press enter to continue")
     input()
-    printLogo()
 
 def showList(access):
     passList = access.getall()
@@ -71,19 +69,19 @@ def showList(access):
         print('\nNo Passwords Available')
     print('Press enter to exit')
     input()
-    printLogo()
-    return
 
 def searchPass(access):
     print("Search by url and email")
     email = input("Enter email: ")
     url = input("Enter url: ")
     data = access.getdata({'url' : url, 'email' : email})
-    pyperclip.copy(decrypt(data[3]).decode())
-    print("Copied to clipboard press any key to continue!")
+    if data:
+        pyperclip.copy(decrypt(data[3]).decode())
+        print("\nCopied to clipboard press ENTER to exit")
+    else:
+        print("\nNo Matches found. Press enter to go back")
     input()
-    printLogo()
-    return
+    
 
 
 def storePassword(access):
@@ -97,6 +95,7 @@ def storePassword(access):
 
 def genetateNStore(access):
     while True:
+        print("Enter -1 to exit\n")
         l = input("Enter Length of password ( > 6): ")
         try:
             t = int(l)
@@ -104,7 +103,9 @@ def genetateNStore(access):
             printLogo()
             print("Please enter integer")
         else:
-            if int(l) > 6:
+            if t == -1:
+                return
+            elif int(l) > 6:
                 break
             else:
                 printLogo()
@@ -115,16 +116,17 @@ def genetateNStore(access):
     savepass(access, password=password)
 
 def savepass(access, password = ''):
-    print('(Not all details are compulsory exept for password and url)\nEnter Details:')
+    print('(Not all details are compulsory exept for password, email and url)\nEnter Details:')
     url = input('Url: ')
     username = input('Username: ')
     email = input('Email: ')
     if password == '':
         password = input('Password: ')
     else:
-        print(f"Password: {password}")
+        print(f"Password: {'*'* len(password)}\nPassword Copied to clipboard")
+        pyperclip.copy(password)
     notes = input('Notes: ')
-    if password and url:
+    if password and url and email:
         access.savedata({
             'url' : url,
             'username' : username,
@@ -132,9 +134,6 @@ def savepass(access, password = ''):
             'email' : email,
             'notes' : notes
         })
-    
-    printLogo()
-
 
 if __name__ == "__main__":
     if KEYPATH == '':
